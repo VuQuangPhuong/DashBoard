@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trung Nam Group – Dashboard Tập Trung 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+  --navy:   #0B1E3D;
+  --navy2:  #0F2849;
+  --blue:   #1558B0;
+  --blue-l: #1E6FD9;
+  --green:  #1A8C38;
+  --green-l:#1FA843;
+  --red:    #C8302A;
+  --red-l:  #D94040;
+  --amber:  #C47A10;
+  --yellow: #D4A017;
+  --white:  #ffffff;
+  --text:   #1A2B45;
+  --text2:  #3D5270;
+  --gray:   #7A90AE;
+  --gray2:  #9FB3CC;
+  --bg:     #F1F5F6;
+  --bg2:    #E6EDF0;
+  --border: #D4DEE8;
+  --card:   #ffffff;
+  --sh:     0 1px 4px rgba(0,0,0,.05);
+  --sh-h:   0 4px 16px rgba(0,0,0,.09);
+
+  /* Plant accent colors */
+  --tnwp:     #1E6FD9;   /* blue  – wind Ninh Thuan */
+  --tntvwp1:  #1FA843;   /* green – wind Tra Vinh   */
+  --tndkl1wp: #C47A10;   /* amber – wind Dak Lak    */
+  --tntvsp:   #D4A017;   /* yellow– solar Tra Vinh  */
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Barlow', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+/* ── TOPBAR ── */
+.topbar {
+  position: sticky; top: 0; z-index: 300;
+  background: var(--navy);
+  border-bottom: 2px solid rgba(255,255,255,.06);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px; height: 62px;
+  box-shadow: 0 2px 16px rgba(0,0,0,.25);
+}
+.tb-left  { display: flex; align-items: center; gap: 20px; }
+.tb-brand {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px; font-weight: 900; letter-spacing: 2.5px;
+  text-transform: uppercase;
+  background: linear-gradient(90deg,#60A5FA,#93C5FD);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  white-space: nowrap;
+}
+.tb-brand-main {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px; font-weight: 900; letter-spacing: 2px;
+  color: #fff; margin-top: 1px;
+}
+.tb-div    { width: 1px; height: 32px; background: rgba(255,255,255,.15); }
+.tb-info   { display: flex; flex-direction: column; gap: 2px; }
+.tb-title  { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1.5px; text-transform: uppercase; color: #fff; }
+.tb-sub    { font-size: 10px; color: rgba(255,255,255,.45); letter-spacing: .5px; }
+.tb-right  { display: flex; align-items: center; gap: 20px; }
+.live-badge { display: flex; align-items: center; gap: 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: #4ADE80; }
+.live-dot   { width: 7px; height: 7px; border-radius: 50%; background: #4ADE80; animation: blink 1.8s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+#clock { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: rgba(255,255,255,.5); }
+
+/* ── PLANT TAB BAR ── */
+.plant-bar {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: stretch; justify-content: space-between;
+  padding: 0 28px; box-shadow: var(--sh);
+  flex-wrap: wrap; gap: 0;
+}
+.plant-tabs { display: flex; gap: 0; overflow-x: auto; }
+.plant-tabs::-webkit-scrollbar { height: 0; }
+.plant-btn {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--gray); background: none; border: none;
+  padding: 0 22px; height: 50px; cursor: pointer; white-space: nowrap;
+  border-bottom: 3px solid transparent; display: flex; align-items: center; gap: 8px;
+  transition: all .2s;
+}
+.plant-btn:hover { color: var(--text); }
+.plant-btn.active { border-bottom-color: currentColor; }
+.plant-btn[data-plant="ALL"]       { color: var(--navy); }
+.plant-btn[data-plant="ALL"].active{ color: var(--navy); border-bottom-color: var(--navy2); }
+.plant-btn[data-plant="TNWP"].active     { color: var(--tnwp); }
+.plant-btn[data-plant="TNTVWP1"].active  { color: var(--tntvwp1); }
+.plant-btn[data-plant="TNDKL1WP"].active { color: var(--tndkl1wp); }
+.plant-btn[data-plant="TNTVSP"].active   { color: var(--tntvsp); }
+.plant-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.pd-all     { background: var(--navy2); }
+.pd-tnwp    { background: var(--tnwp); }
+.pd-tntvwp1 { background: var(--tntvwp1); }
+.pd-tndkl1wp{ background: var(--tndkl1wp); }
+.pd-tntvsp  { background: var(--tntvsp); }
+
+.sec-tabs { display: flex; align-items: center; gap: 5px; padding: 8px 0; flex-wrap: wrap; }
+.sec-btn {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase;
+  color: var(--gray); background: none;
+  border: 1px solid var(--border); border-radius: 4px;
+  padding: 5px 13px; cursor: pointer; transition: all .2s; white-space: nowrap;
+}
+.sec-btn:hover { color: var(--text); border-color: var(--gray2); }
+.sec-btn.active { color: #fff; background: var(--blue-l); border-color: var(--blue-l); }
+
+/* ── LAYOUT ── */
+.content { padding: 22px 28px; }
+.page    { display: none; }
+.page.active { display: block; }
+.g2  { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; }
+.g3  { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+.g4  { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+.g5  { display: grid; grid-template-columns: repeat(5,1fr); gap: 14px; }
+.gw  { display: grid; grid-template-columns: 3fr 2fr; gap: 14px; }
+.ga  { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; }
+.mb  { margin-bottom: 14px; }
+.mb2 { margin-bottom: 22px; }
+.span2 { grid-column: span 2; }
+.span3 { grid-column: span 3; }
+.span4 { grid-column: span 4; }
+
+/* ── CARD ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 18px 20px; position: relative; overflow: hidden;
+  box-shadow: var(--sh); transition: box-shadow .2s, border-color .2s;
+}
+.card:hover { box-shadow: var(--sh-h); border-color: #BAD0E4; }
+.c-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--gray); margin-bottom: 5px;
+}
+.c-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase;
+  color: var(--text); margin-bottom: 14px;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.badge {
+  font-size: 9px; font-weight: 700; letter-spacing: 1px;
+  padding: 2px 8px; border-radius: 20px; flex-shrink: 0;
+}
+.badge-blue   { background: rgba(30,111,217,.1);  color: var(--blue-l);  border: 1px solid rgba(30,111,217,.2); }
+.badge-green  { background: rgba(26,140,56,.1);   color: var(--green);   border: 1px solid rgba(26,140,56,.2); }
+.badge-amber  { background: rgba(196,122,16,.12); color: var(--amber);   border: 1px solid rgba(196,122,16,.25); }
+.badge-red    { background: rgba(200,48,42,.1);   color: var(--red);     border: 1px solid rgba(200,48,42,.2); }
+.badge-yellow { background: rgba(212,160,23,.12); color: #9A6D00;        border: 1px solid rgba(212,160,23,.3); }
+.badge-navy   { background: rgba(11,30,61,.1);    color: var(--navy);    border: 1px solid rgba(11,30,61,.18); }
+
+/* ── KPI ── */
+.kpi-val  { font-family: 'Barlow Condensed', sans-serif; font-size: 40px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+.kpi-unit { font-size: 15px; font-weight: 400; color: var(--gray); margin-left: 3px; }
+.kpi-sub  { font-size: 11px; color: var(--gray); margin-top: 5px; }
+.kpi-delta {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 20px; margin-top: 8px;
+}
+.delta-up   { background: rgba(26,140,56,.1);  color: var(--green); }
+.delta-down { background: rgba(217,64,64,.1);  color: var(--red-l); }
+.delta-warn { background: rgba(196,122,16,.1); color: var(--amber); }
+.delta-ok   { background: rgba(30,111,217,.1); color: var(--blue-l); }
+
+.glow-blue   { background: linear-gradient(135deg,#EFF5FF 0%,#fff 100%); border-color: #C2D6F5; }
+.glow-green  { background: linear-gradient(135deg,#EDFAF2 0%,#fff 100%); border-color: #B8EAC8; }
+.glow-amber  { background: linear-gradient(135deg,#FFF7EE 0%,#fff 100%); border-color: #F2D9A0; }
+.glow-yellow { background: linear-gradient(135deg,#FFFBEA 0%,#fff 100%); border-color: #F0D878; }
+.glow-red    { background: linear-gradient(135deg,#FFF0EF 0%,#fff 100%); border-color: #F5BFBC; }
+.glow-navy   { background: linear-gradient(135deg,#EEF2FF 0%,#fff 100%); border-color: #C7D5F5; }
+
+.accent-blue   .kpi-val { color: var(--blue-l); }
+.accent-green  .kpi-val { color: var(--green); }
+.accent-amber  .kpi-val { color: var(--amber); }
+.accent-yellow .kpi-val { color: #B07800; }
+.accent-red    .kpi-val { color: var(--red-l); }
+.accent-navy   .kpi-val { color: var(--navy); }
+
+/* ── CHART ── */
+.chart-wrap canvas          { max-height: 260px; }
+.chart-wrap.tall canvas     { max-height: 320px; }
+.chart-wrap.short canvas    { max-height: 175px; }
+.chart-wrap.xshort canvas   { max-height: 130px; }
+
+/* ── PROGRESS ── */
+.prog-row   { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+.prog-label { min-width: 110px; font-size: 11px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.prog-bar   { flex: 1; height: 6px; background: var(--bg2); border-radius: 3px; overflow: hidden; }
+.prog-fill  { height: 100%; border-radius: 3px; transition: width 1.1s cubic-bezier(.4,0,.2,1); }
+.pf-blue    { background: linear-gradient(90deg,var(--blue),var(--blue-l)); }
+.pf-green   { background: linear-gradient(90deg,var(--green),#2EC054); }
+.pf-amber   { background: linear-gradient(90deg,var(--amber),#E89A2A); }
+.pf-yellow  { background: linear-gradient(90deg,#C4920E,#F5C518); }
+.pf-red     { background: var(--red-l); }
+.prog-val   { min-width: 50px; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text2); }
+
+/* ── TABLE ── */
+.tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+.tbl th {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--gray); text-align: left; padding: 8px 10px;
+  border-bottom: 1px solid var(--border); background: var(--bg);
+  white-space: nowrap;
+}
+.tbl td { padding: 8px 10px; border-bottom: 1px solid var(--bg2); color: var(--text2); vertical-align: middle; }
+.tbl tr:last-child td { border-bottom: none; }
+.tbl tr:hover td { background: var(--bg); }
+.tbl .num  { font-family: 'JetBrains Mono', monospace; text-align: right; }
+.tbl .good { color: var(--green); font-weight: 700; }
+.tbl .bad  { color: var(--red-l); font-weight: 700; }
+.tbl .warn { color: var(--amber); font-weight: 700; }
+.tbl .bold { font-weight: 700; color: var(--text); }
+
+/* ── PLANT CARD ── */
+.plant-overview-card {
+  border-radius: 10px; padding: 20px;
+  position: relative; overflow: hidden; cursor: pointer;
+  transition: transform .18s, box-shadow .18s;
+  box-shadow: var(--sh);
+}
+.plant-overview-card:hover { transform: translateY(-3px); box-shadow: var(--sh-h); }
+.poc-accent {
+  position: absolute; top: 0; left: 0; width: 4px; height: 100%; border-radius: 10px 0 0 10px;
+}
+.poc-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 3px;
+}
+.poc-sub { font-size: 11px; color: var(--text2); margin-bottom: 12px; }
+.poc-type {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 20px; display: inline-flex; align-items: center; gap: 4px;
+  margin-bottom: 12px;
+}
+.poc-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+.poc-metric-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px; font-weight: 700; line-height: 1;
+}
+.poc-metric-lbl { font-size: 10px; color: var(--gray); margin-top: 3px; }
+.poc-progress { margin-top: 12px; }
+.poc-prog-bar { height: 5px; background: var(--bg2); border-radius: 3px; margin-top: 5px; overflow: hidden; }
+.poc-prog-fill { height: 100%; border-radius: 3px; }
+
+/* ── DIVIDER ── */
+.sh-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--gray); padding-bottom: 7px; margin-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── TOTAL BANNER ── */
+.total-banner {
+  background: var(--navy);
+  border-radius: 10px; padding: 20px 24px; margin-bottom: 16px;
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 0;
+  position: relative; overflow: hidden;
+}
+.total-banner::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 80% 50%, rgba(30,111,217,.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+.tb-item { padding: 8px 20px; position: relative; z-index: 1; }
+.tb-item + .tb-item { border-left: 1px solid rgba(255,255,255,.1); }
+.tb-val  { font-family: 'Barlow Condensed', sans-serif; font-size: 34px; font-weight: 900; color: #fff; line-height: 1; letter-spacing: -1px; }
+.tb-unit { font-size: 13px; font-weight: 400; color: rgba(255,255,255,.5); margin-left: 3px; }
+.tb-lbl  { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.45); margin-top: 4px; }
+.tb-d    { font-size: 11px; font-weight: 700; margin-top: 6px; padding: 2px 8px; border-radius: 20px; display: inline-block; }
+.tb-d-up   { background: rgba(74,222,128,.15); color: #4ADE80; }
+.tb-d-down { background: rgba(248,113,113,.15); color: #F87171; }
+.tb-d-ok   { background: rgba(96,165,250,.15);  color: #93C5FD; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1100px) {
+  .g5 { grid-template-columns: repeat(3,1fr); }
+  .total-banner { grid-template-columns: repeat(2,1fr); }
+  .tb-item + .tb-item { border-left: none; }
+  .tb-item:nth-child(2n) { border-left: 1px solid rgba(255,255,255,.1); }
+  .tb-item:nth-child(n+3) { border-top: 1px solid rgba(255,255,255,.1); }
+}
+@media (max-width: 960px) {
+  .topbar, .plant-bar, .content { padding-left: 16px; padding-right: 16px; }
+  .g4 { grid-template-columns: repeat(2,1fr); }
+  .g3 { grid-template-columns: repeat(2,1fr); }
+  .gw, .ga { grid-template-columns: 1fr; }
+  .span2,.span3,.span4 { grid-column: span 1; }
+}
+@media (max-width: 640px) {
+  .g2,.g3,.g4,.g5 { grid-template-columns: 1fr; }
+  .kpi-val { font-size: 32px; }
+  .tb-val  { font-size: 26px; }
+  .total-banner { grid-template-columns: repeat(2,1fr); }
+  .tb-sub { display: none; }
+  #clock  { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ TOPBAR ══ -->
+<header class="topbar">
+  <div class="tb-left">
+    <div>
+      <div class="tb-brand">TẬP ĐOÀN NĂNG LƯỢNG</div>
+      <div class="tb-brand-main">TRUNG NAM GROUP</div>
+    </div>
+    <div class="tb-div"></div>
+    <div class="tb-info">
+      <div class="tb-title">⚡ Dashboard Vận Hành Tập Trung · 2026</div>
+      <div class="tb-sub">4 Nhà Máy · Gió + Mặt Trời · Ninh Thuận · Trà Vinh · Đắk Lắk</div>
+    </div>
+  </div>
+  <div class="tb-right">
+    <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+    <div id="clock"></div>
+  </div>
+</header>
+
+<!-- ══ PLANT & SECTION TABS ══ -->
+<nav class="plant-bar">
+  <div class="plant-tabs">
+    <button class="plant-btn active" data-plant="ALL"       onclick="switchPlant('ALL',this)">
+      <div class="plant-dot pd-all"></div>⊞ Tổng Hợp Tập Đoàn
+    </button>
+    <button class="plant-btn" data-plant="TNWP"        onclick="switchPlant('TNWP',this)">
+      <div class="plant-dot pd-tnwp"></div>💨 TNWP
+    </button>
+    <button class="plant-btn" data-plant="TNTVWP1"     onclick="switchPlant('TNTVWP1',this)">
+      <div class="plant-dot pd-tntvwp1"></div>💨 TNTVWP1
+    </button>
+    <button class="plant-btn" data-plant="TNDKL1WP"    onclick="switchPlant('TNDKL1WP',this)">
+      <div class="plant-dot pd-tndkl1wp"></div>💨 TNDKL1WP
+    </button>
+    <button class="plant-btn" data-plant="TNTVSP"      onclick="switchPlant('TNTVSP',this)">
+      <div class="plant-dot pd-tntvsp"></div>☀️ TNTVSP
+    </button>
+  </div>
+  <div class="sec-tabs">
+    <button class="sec-btn active" onclick="switchSec('overview',this)">Tổng Quan</button>
+    <button class="sec-btn" onclick="switchSec('sanluong',this)">Sản Lượng</button>
+    <button class="sec-btn" onclick="switchSec('doanhthu',this)">Doanh Thu</button>
+    <button class="sec-btn" onclick="switchSec('chiphi',this)">Chi Phí</button>
+    <button class="sec-btn" onclick="switchSec('vanhanh',this)">Vận Hành</button>
+  </div>
+</nav>
+
+<!-- ══ CONTENT ══ -->
+<main class="content">
+
+  <!-- ════════════ PAGE: OVERVIEW ════════════ -->
+  <div class="page active" id="page-overview">
+
+    <!-- Total Banner -->
+    <div class="total-banner mb2" id="total-banner">
+      <div class="tb-item">
+        <div class="tb-val" id="tot-sl">0<span class="tb-unit">tr kWh</span></div>
+        <div class="tb-lbl">Tổng Sản Lượng Lũy Kế</div>
+        <div class="tb-d tb-d-up" id="tot-sl-d">Loading…</div>
+      </div>
+      <div class="tb-item">
+        <div class="tb-val" id="tot-dt">0<span class="tb-unit">tỷ đ</span></div>
+        <div class="tb-lbl">Tổng Doanh Thu Lũy Kế</div>
+        <div class="tb-d tb-d-up" id="tot-dt-d">Loading…</div>
+      </div>
+      <div class="tb-item">
+        <div class="tb-val" id="tot-cp">0<span class="tb-unit">tỷ đ</span></div>
+        <div class="tb-lbl">Tổng Chi Phí HĐSX Lũy Kế</div>
+        <div class="tb-d tb-d-ok" id="tot-cp-d">Loading…</div>
+      </div>
+      <div class="tb-item">
+        <div class="tb-val" id="tot-cap">0<span class="tb-unit">MW</span></div>
+        <div class="tb-lbl">Tổng Công Suất Lắp Đặt</div>
+        <div class="tb-d tb-d-ok">4 Nhà Máy</div>
+      </div>
+    </div>
+
+    <!-- Plant Cards -->
+    <div class="g4 mb2" id="plant-cards-row">
+      <!-- Will be injected by JS -->
+    </div>
+
+    <!-- Charts row 1 -->
+    <div class="gw mb2">
+      <div class="card">
+        <div class="c-title">So Sánh Sản Lượng Thực Tế vs KH (triệu kWh) <span class="badge badge-blue">T01–T04</span></div>
+        <div class="chart-wrap"><canvas id="ch-ov-sl-compare"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="c-title">Tỉ Lệ Đóng Góp Sản Lượng</div>
+        <div class="chart-wrap"><canvas id="ch-ov-sl-pie"></canvas></div>
+      </div>
+    </div>
+
+    <div class="g3 mb2">
+      <div class="card">
+        <div class="c-title">Doanh Thu Lũy Kế Theo Nhà Máy <span class="badge badge-green">tỷ đồng</span></div>
+        <div class="chart-wrap"><canvas id="ch-ov-dt-bar"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="c-title">Chi Phí HĐSX Lũy Kế <span class="badge badge-amber">tỷ đồng</span></div>
+        <div class="chart-wrap"><canvas id="ch-ov-cp-bar"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="c-title">% Hoàn Thành KH Năm <span class="badge badge-navy">YTD</span></div>
+        <div class="chart-wrap"><canvas id="ch-ov-kh-radar"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Summary Table -->
+    <div class="card mb2">
+      <div class="c-title">Bảng Tổng Hợp Tất Cả Nhà Máy</div>
+      <div style="overflow-x:auto;">
+        <table class="tbl" id="tbl-summary">
+          <thead>
+            <tr>
+              <th>Nhà Máy</th><th>Loại</th><th>CS (MW)</th><th>Địa Điểm</th>
+              <th>SL KH (tr kWh)</th><th>SL TT (tr kWh)</th><th>HT KH</th>
+              <th>DT TT (tỷ đ)</th><th>CP HĐSX (tỷ đ)</th>
+              <th>KSD (%)</th><th>Data</th>
+            </tr>
+          </thead>
+          <tbody id="tbl-summary-body"></tbody>
+          <tfoot id="tbl-summary-foot"></tfoot>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /page-overview -->
+
+  <!-- ════════════ PAGE: SẢN LƯỢNG ════════════ -->
+  <div class="page" id="page-sanluong">
+    <div class="g4 mb2">
+      <div class="card kpi glow-blue accent-blue">
+        <div class="c-label">Tổng SL Lũy Kế</div>
+        <div class="kpi-val" id="sl-tot-lk">569.3<span class="kpi-unit">tr kWh</span></div>
+        <div class="kpi-sub">T01–T04/2026</div>
+        <div class="kpi-delta delta-ok" id="sl-tot-ht">▲ Tổng 4 Nhà Máy</div>
+      </div>
+      <div class="card kpi glow-green accent-green">
+        <div class="c-label">SL Vượt KH Cao Nhất</div>
+        <div class="kpi-val">TNTVSP<span class="kpi-unit"> +17.3%</span></div>
+        <div class="kpi-sub">Vượt KH T1–T3/2026</div>
+        <div class="kpi-delta delta-up">☀ Điện mặt trời</div>
+      </div>
+      <div class="card kpi glow-amber accent-amber">
+        <div class="c-label">SL Chưa Đạt KH</div>
+        <div class="kpi-val">TNDKL1WP<span class="kpi-unit"> 33.2%</span></div>
+        <div class="kpi-sub">Lũy kế / KH Năm</div>
+        <div class="kpi-delta delta-warn">T04 đạt 51.3% KH</div>
+      </div>
+      <div class="card kpi glow-red">
+        <div class="c-label">KH Năm Tổng 4 NM</div>
+        <div class="kpi-val accent-navy" id="sl-kh-nam">1,517<span class="kpi-unit">tr kWh</span></div>
+        <div class="kpi-sub">Kế hoạch 2026 toàn tập đoàn</div>
+      </div>
+    </div>
+    <div class="g2 mb2">
+      <div class="card">
+        <div class="c-title">SL Thực Tế vs KH Theo Tháng – Từng Nhà Máy</div>
+        <div class="chart-wrap tall"><canvas id="ch-sl-monthly-grouped"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="c-title">Tích Lũy Sản Lượng Theo Tháng (triệu kWh)</div>
+        <div class="chart-wrap tall"><canvas id="ch-sl-cumulative"></canvas></div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="c-title">% Hoàn Thành KH Theo Tháng</div>
+        <div class="chart-wrap"><canvas id="ch-sl-ht-pct"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="c-title">Lũy Kế / KH Năm (%) – Tiến Độ Từng Nhà Máy</div>
+        <div style="margin-top:8px;">
+          <div class="sh-title">TNWP – Điện Gió Ninh Thuận (151.95 MW)</div>
+          <div class="prog-row"><div class="prog-label">SL T1-T4 / KH Năm</div><div class="prog-bar"><div class="prog-fill pf-blue" style="width:19.3%"></div></div><div class="prog-val">19.3%</div></div>
+          <div class="prog-row"><div class="prog-label">SL TT: 146.3 tr kWh</div><div class="prog-bar"><div class="prog-fill pf-blue" style="width:100%"></div></div><div class="prog-val">~757 KH</div></div>
+          <div class="sh-title" style="margin-top:10px;">TNTVWP1 – Điện Gió Trà Vinh (100 MW)</div>
+          <div class="prog-row"><div class="prog-label">SL T1-T3 / KH Năm</div><div class="prog-bar"><div class="prog-fill pf-green" style="width:38.1%"></div></div><div class="prog-val">38.1%</div></div>
+          <div class="prog-row"><div class="prog-label">SL TT: 109.3 tr kWh</div><div class="prog-bar"><div class="prog-fill pf-green" style="width:100%"></div></div><div class="prog-val">287 KH</div></div>
+          <div class="sh-title" style="margin-top:10px;">TNDKL1WP – Điện Gió Đắk Lắk (400 MW)</div>
+          <div class="prog-row"><div class="prog-label">SL T1-T4 / KH Năm</div><div class="prog-bar"><div class="prog-fill pf-amber" style="width:33.2%"></div></div><div class="prog-val">33.2%</div></div>
+          <div class="prog-row"><div class="prog-label">SL TT: 249.4 tr kWh</div><div class="prog-bar"><div class="prog-fill pf-amber" style="width:100%"></div></div><div class="prog-val">750.7 KH</div></div>
+          <div class="sh-title" style="margin-top:10px;">TNTVSP – Điện Mặt Trời Trà Vinh (140.08 MW)</div>
+          <div class="prog-row"><div class="prog-label">SL T1-T3 / KH Năm</div><div class="prog-bar"><div class="prog-fill pf-yellow" style="width:28.2%"></div></div><div class="prog-val">28.2%</div></div>
+          <div class="prog-row"><div class="prog-label">SL TT: 64.3 tr kWh</div><div class="prog-bar"><div class="prog-fill pf-yellow" style="width:100%"></div></div><div class="prog-val">228.4 KH</div></div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /page-sanluong -->
+
+  <!-- ════════════ PAGE: DOANH THU ════════════ -->
+  <div class="page" id="page-doanhthu">
+    <div class="g4 mb2">
+      <div class="card kpi glow-green accent-green">
+        <div class="c-label">Tổng DT Lũy Kế</div>
+        <div class="kpi-val" id="dt-tot-lk">1,262<span class="kpi-unit">tỷ đ</span></div>
+        <div class="kpi-sub">T01–T04/2026 toàn tập đoàn</div>
+        <div class="kpi-delta delta-up" id="dt-tot-d">▲ 4 Nhà Máy</div>
+      </div>
+      <div class="card kpi glow-blue accent-blue">
+        <div class="c-label">DT Cao Nhất (NM)</div>
+        <div class="kpi-val">TNDKL1WP</div>
+        <div class="kpi-sub">531.2 tỷ đồng (T1–T4)</div>
+        <div class="kpi-delta delta-up">42.1% tổng tập đoàn</div>
+      </div>
+      <div class="card kpi glow-amber accent-amber">
+        <div class="c-label">DT/MW Hiệu Quả Nhất</div>
+        <div class="kpi-val">TNTVSP</div>
+        <div class="kpi-sub">1.075 tỷ/MW (T1–T3)</div>
+        <div class="kpi-delta delta-up">☀ Giá điện mặt trời</div>
+      </div>
+      <div class="card kpi glow-navy">
+        <div class="c-label">KH DT Năm Toàn TĐ</div>
+        <div class="kpi-val accent-navy" id="dt-kh-nam">3,061<span class="kpi-unit">tỷ đ</span></div>
+        <div class="kpi-sub">Kế hoạch doanh thu 2026</div>
+      </div>
+    </div>
+    <div class="gw mb2">
+      <div class="card">
+        <div class="c-title">Doanh Thu Thực Tế Theo Tháng – Từng Nhà Máy (tỷ đồng)</div>
+        <div class="chart-wrap tall"><canvas id="ch-dt-monthly"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="c-title">Cơ Cấu Doanh Thu Lũy Kế</div>
+        <div class="chart-wrap"><canvas id="ch-dt-pie"></canvas></div>
+        <div style="margin-top:16px;">
+          <div class="prog-row"><div class="prog-label">TNDKL1WP</div><div class="prog-bar"><div class="prog-fill pf-amber" style="width:42.1%"></div></div><div class="prog-val">42.1%</div></div>
+          <div class="prog-row"><div class="prog-label">TNTVWP1</div><div class="prog-bar"><div class="prog-fill pf-green" style="width:21.3%"></div></div><div class="prog-val">21.3%</div></div>
+          <div class="prog-row"><div class="prog-label">TNWP</div><div class="prog-bar"><div class="prog-fill pf-blue" style="width:24.7%"></div></div><div class="prog-val">24.7%</div></div>
+          <div class="prog-row"><div class="prog-label">TNTVSP</div><div class="prog-bar"><div class="prog-fill pf-yellow" style="width:11.9%"></div></div><div class="prog-val">11.9%</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="c-title">DT TT vs DT KH Từng Tháng (tỷ đ)</div>
+        <div class="chart-wrap"><canvas id="ch-dt-vs-kh"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="c-title">Doanh Thu Tích Lũy 4 Nhà Máy</div>
+        <div class="chart-wrap"><canvas id="ch-dt-cumulative"></canvas></div>
+      </div>
+    </div>
+  </div><!-- /page-doanhthu -->
+
+  <!-- ════════════ PAGE: CHI PHÍ ════════════ -->
+  <div class="page" id="page-chiphi">
+    <div class="g4 mb2">
+      <div class="card kpi glow-amber accent-amber">
+        <div class="c-label">Tổng CP HĐSX Lũy Kế</div>
+        <div class="kpi-val" id="cp-tot-lk">142.4<span class="kpi-unit">tỷ đ</span></div>
+        <div class="kpi-sub">Chi phí hoạt động sản xuất</div>
+      </div>
+      <div class="card kpi glow-blue accent-blue">
+        <div class="c-label">CP HĐSX Thấp Nhất</div>
+        <div class="kpi-val">TNTVSP</div>
+        <div class="kpi-sub">4.95 tỷ đ (T1–T3)</div>
+        <div class="kpi-delta delta-up">3.3% tổng CP</div>
+      </div>
+      <div class="card kpi glow-red">
+        <div class="c-label">CP/DT Ratio Tốt Nhất</div>
+        <div class="kpi-val">TNTVSP</div>
+        <div class="kpi-sub">3.28% chi phí/doanh thu</div>
+        <div class="kpi-delta delta-up">☀ Hiệu quả cao</div>
+      </div>
+      <div class="card kpi glow-navy">
+        <div class="c-label">CP/Sản Lượng TB</div>
+        <div class="kpi-val accent-navy" id="cp-per-sl">249<span class="kpi-unit">đ/kWh</span></div>
+        <div class="kpi-sub">Chi phí vận hành / sản lượng</div>
+      </div>
+    </div>
+    <div class="gw mb2">
+      <div class="card">
+        <div class="c-title">Chi Phí HĐSX Theo Tháng – Từng Nhà Máy (tỷ đồng)</div>
+        <div class="chart-wrap tall"><canvas id="ch-cp-monthly"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="c-title">Tỉ Lệ CP/DT Từng Nhà Máy (%)</div>
+        <div class="chart-wrap"><canvas id="ch-cp-ratio"></canvas></div>
+        <div style="margin-top:16px;">
+          <div class="sh-title">Chi Phí / Doanh Thu</div>
+          <div class="prog-row"><div class="prog-label">TNTVSP</div><div class="prog-bar"><div class="prog-fill pf-yellow" style="width:3.3%"></div></div><div class="prog-val">3.3%</div></div>
+          <div class="prog-row"><div class="prog-label">TNWP</div><div class="prog-bar"><div class="prog-fill pf-blue" style="width:8.9%"></div></div><div class="prog-val">8.9%</div></div>
+          <div class="prog-row"><div class="prog-label">TNTVWP1</div><div class="prog-bar"><div class="prog-fill pf-green" style="width:15.4%"></div></div><div class="prog-val">15.4%</div></div>
+          <div class="prog-row"><div class="prog-label">TNDKL1WP</div><div class="prog-bar"><div class="prog-fill pf-amber" style="width:12.9%"></div></div><div class="prog-val">12.9%</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="c-title">Bảng Phân Tích Chi Phí Chi Tiết</div>
+      <div style="overflow-x:auto;">
+        <table class="tbl">
+          <thead><tr><th>Nhà Máy</th><th>CP HĐSX (tỷ)</th><th>CP Tài Chính (tỷ)</th><th>CP Khác (tỷ)</th><th>Tổng CP (tỷ)</th><th>DT TT (tỷ)</th><th>CP/DT</th><th>CP/MW</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong style="color:var(--tnwp)">TNWP</strong><div style="font-size:10px;color:var(--gray)">151.95 MW · Gió</div></td>
+              <td class="num">27.72</td><td class="num">~38.0</td><td class="num">~2.8</td><td class="num">~68.5</td>
+              <td class="num">311.74</td><td class="num warn">8.9%</td><td class="num">0.18 tỷ/MW</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--tntvwp1)">TNTVWP1</strong><div style="font-size:10px;color:var(--gray)">100 MW · Gió</div></td>
+              <td class="num">41.44</td><td class="num">57.44</td><td class="num">1.60</td><td class="num">100.05</td>
+              <td class="num">268.54</td><td class="num warn">15.4%</td><td class="num">0.41 tỷ/MW</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--tndkl1wp)">TNDKL1WP</strong><div style="font-size:10px;color:var(--gray)">400 MW · Gió</div></td>
+              <td class="num">68.31</td><td class="num">—</td><td class="num">—</td><td class="num">68.31</td>
+              <td class="num">531.20</td><td class="num good">12.9%</td><td class="num">0.17 tỷ/MW</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--tntvsp)">TNTVSP</strong><div style="font-size:10px;color:var(--gray)">140.08 MW · Mặt Trời</div></td>
+              <td class="num">4.95</td><td class="num">22.01</td><td class="num">1.41</td><td class="num">28.37</td>
+              <td class="num">150.69</td><td class="num good">3.3%</td><td class="num">0.04 tỷ/MW</td>
+            </tr>
+            <tr style="background:var(--bg);">
+              <td class="bold">TỔNG TẬP ĐOÀN</td>
+              <td class="num bold">142.42</td><td class="num bold">~117</td><td class="num bold">~5.8</td><td class="num bold">~265</td>
+              <td class="num bold">1,262.2</td><td class="num bold">11.3%</td><td class="num bold">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div><!-- /page-chiphi -->
+
+  <!-- ════════════ PAGE: VẬN HÀNH ════════════ -->
+  <div class="page" id="page-vanhanh">
+    <div class="g4 mb2">
+      <div class="card kpi glow-green accent-green">
+        <div class="c-label">KSD TB Toàn Tập Đoàn</div>
+        <div class="kpi-val">97.4<span class="kpi-unit">%</span></div>
+        <div class="kpi-sub">Hệ số khả dụng trung bình</div>
+        <div class="kpi-delta delta-up">▲ Vận hành ổn định</div>
+      </div>
+      <div class="card kpi glow-blue accent-blue">
+        <div class="c-label">KSD Cao Nhất</div>
+        <div class="kpi-val">TNTVSP</div>
+        <div class="kpi-sub">99.84% – Điện mặt trời</div>
+        <div class="kpi-delta delta-up">☀ T01/2026</div>
+      </div>
+      <div class="card kpi glow-amber accent-amber">
+        <div class="c-label">Tổng CS Lắp Đặt</div>
+        <div class="kpi-val">792<span class="kpi-unit">MW</span></div>
+        <div class="kpi-sub">Gió: 651.95 MW · Mặt Trời: 140.08 MW</div>
+      </div>
+      <div class="card kpi glow-navy">
+        <div class="c-label">Tổng Số Tháng Vận Hành</div>
+        <div class="kpi-val accent-navy">13<span class="kpi-unit">tháng-NM</span></div>
+        <div class="kpi-sub">Dữ liệu T01–T04/2026</div>
+      </div>
+    </div>
+    <div class="g2 mb2">
+      <div class="card">
+        <div class="c-title">Hệ Số Khả Dụng (KSD %) – Các Nhà Máy</div>
+        <div class="chart-wrap"><canvas id="ch-vh-ksd"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="c-title">Hệ Số Nhà Máy / Công Suất (KNM %)</div>
+        <div class="chart-wrap"><canvas id="ch-vh-knm"></canvas></div>
+      </div>
+    </div>
+    <div class="card mb2">
+      <div class="c-title">Bảng So Sánh Vận Hành Chi Tiết</div>
+      <div style="overflow-x:auto;">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Nhà Máy</th><th>Loại</th><th>CS (MW)</th>
+              <th>KSD T1 (%)</th><th>KSD T2 (%)</th><th>KSD T3 (%)</th><th>KSD T4 (%)</th>
+              <th>KNM T1 (%)</th><th>KNM T2 (%)</th><th>KNM T3 (%)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong style="color:var(--tnwp)">TNWP</strong></td>
+              <td><span class="badge badge-blue">💨 Gió</span></td>
+              <td class="num">151.95</td>
+              <td class="num good">98.57</td><td class="num good">97.16</td><td class="num good">96.40</td><td class="num good">96.67</td>
+              <td class="num">56.00</td><td class="num">44.00</td><td class="num">25.50</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--tntvwp1)">TNTVWP1</strong></td>
+              <td><span class="badge badge-green">💨 Gió</span></td>
+              <td class="num">100</td>
+              <td class="num good">99.63</td><td class="num good">99.70</td><td class="num good">99.76</td><td class="num">—</td>
+              <td class="num">38.30</td><td class="num">46.49</td><td class="num">47.24</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--tndkl1wp)">TNDKL1WP</strong></td>
+              <td><span class="badge badge-amber">💨 Gió</span></td>
+              <td class="num">400</td>
+              <td class="num good">97.72</td><td class="num good">97.10</td><td class="num good">95.45</td><td class="num warn">93.37</td>
+              <td class="num">32.03</td><td class="num">27.62</td><td class="num">21.34</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--tntvsp)">TNTVSP</strong></td>
+              <td><span class="badge badge-yellow">☀ Mặt Trời</span></td>
+              <td class="num">140.08</td>
+              <td class="num good">99.84</td><td class="num good">99.68</td><td class="num good">99.92</td><td class="num">—</td>
+              <td class="num">98.00</td><td class="num">95.60</td><td class="num">98.00</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="g3">
+      <div class="card">
+        <div class="c-title">Radar Hiệu Suất Vận Hành</div>
+        <div class="chart-wrap"><canvas id="ch-vh-radar"></canvas></div>
+      </div>
+      <div class="card span2">
+        <div class="c-title">SL Hao Hụt & Cắt Giảm Theo Nhà Máy (triệu kWh)</div>
+        <div class="chart-wrap short"><canvas id="ch-vh-haohut"></canvas></div>
+        <div style="margin-top:14px; font-size:12px; color:var(--text2); line-height:1.8;">
+          <strong>Ghi chú:</strong> SL hao hụt = cắt giảm + thất thoát (lỗi kỹ thuật).<br>
+          TNDKL1WP có hao hụt cao nhất (0.41 tr kWh T04) do cắt giảm lưới điện và lỗi kỹ thuật nhiều hơn.<br>
+          TNTVSP có hao hụt thấp nhất theo tỉ lệ (0.9–1.6% SL).
+        </div>
+      </div>
+    </div>
+  </div><!-- /page-vanhanh -->
+
+  <!-- ════ INDIVIDUAL PLANT PAGES ════ -->
+  <div class="page" id="page-plant-detail">
+    <div id="plant-detail-content"></div>
+  </div>
+
+</main>
+
+<script>
+// ════════════════════════════════════════════════════
+// MASTER DATA
+// ════════════════════════════════════════════════════
+const PLANTS = {
+  TNWP: {
+    name: 'TNWP', fullName: 'Điện Gió Trung Nam Ninh Thuận',
+    type: 'wind', typeLabel: '💨 Điện Gió', location: 'Ninh Thuận',
+    capacity: 151.95, color: '#1E6FD9', colorA: 'rgba(30,111,217,.18)',
+    kh_sl_nam: 756.91, kh_dt_nam: 1614.86,
+    months: ['T01','T02','T03','T04'],
+    sl_tt:  [64.20, 44.90, 28.90,  8.30],
+    sl_kh:  [59.52, 43.19, 31.88, 18.32],
+    sl_hh:  [ 2.28,  2.36,  1.20,  0.52],
+    dt_tt:  [136.78, 95.47, 61.69, 17.80],
+    dt_kh:  [126.99, 92.14, 68.01, 39.08],
+    cp_tt:  [  6.48,  5.84,  7.90,  7.50],
+    cp_kh:  [  6.42,  6.42,  6.58,  7.48],
+    ksd:    [0.9857, 0.9716, 0.9640, 0.9667],
+    knm:    [0.5600, 0.4400, 0.2550, 0.0760],
+    dataMonths: 4,
+  },
+  TNTVWP1: {
+    name: 'TNTVWP1', fullName: 'Điện Gió Trung Nam Trà Vinh 1',
+    type: 'wind', typeLabel: '💨 Điện Gió', location: 'Trà Vinh',
+    capacity: 100, color: '#1FA843', colorA: 'rgba(31,168,67,.18)',
+    kh_sl_nam: 287.07, kh_dt_nam: 663.48,
+    months: ['T01','T02','T03'],
+    sl_tt:  [34.55, 39.80, 34.95],
+    sl_kh:  [41.36, 47.27, 25.52],
+    sl_hh:  [ 0.08,  0.42,  0.33],
+    dt_tt:  [84.83, 97.73, 85.98],
+    dt_kh:  [95.59,109.25, 58.99],
+    cp_tt:  [11.31, 11.85, 18.28],
+    cp_kh:  [41.36, 47.27, 25.52], // using as reference
+    ksd:    [0.9963, 0.9970, 0.9976],
+    knm:    [0.3830, 0.4649, 0.4724],
+    dataMonths: 3,
+  },
+  TNDKL1WP: {
+    name: 'TNDKL1WP', fullName: 'Điện Gió Trung Nam Đắk Lắk 1',
+    type: 'wind', typeLabel: '💨 Điện Gió', location: 'Đắk Lắk',
+    capacity: 400, color: '#C47A10', colorA: 'rgba(196,122,16,.18)',
+    kh_sl_nam: 750.66, kh_dt_nam: 1604.73,
+    months: ['T01','T02','T03','T04'],
+    sl_tt:  [95.33, 74.24, 63.50, 16.32],
+    sl_kh:  [108.72, 86.15, 66.12, 31.82],
+    sl_hh:  [ 0.136, 0.090, 0.077, 0.106],
+    dt_tt:  [202.73,158.13,135.52, 34.83],
+    dt_kh:  [232.42,184.17,141.35, 68.02],
+    cp_tt:  [16.71, 16.71, 17.30, 17.59],
+    cp_kh:  [17.16, 17.16, 17.52, 17.91],
+    ksd:    [0.9772, 0.9710, 0.9545, 0.9337],
+    knm:    [0.3203, 0.2762, 0.2134, 0.0567],
+    dataMonths: 4,
+  },
+  TNTVSP: {
+    name: 'TNTVSP', fullName: 'Điện Mặt Trời Trung Nam Trà Vinh',
+    type: 'solar', typeLabel: '☀ Điện Mặt Trời', location: 'Trà Vinh',
+    capacity: 140.08, color: '#D4A017', colorA: 'rgba(212,160,23,.18)',
+    kh_sl_nam: 228.40, kh_dt_nam: 505.72,
+    months: ['T01','T02','T03'],
+    sl_tt:  [21.02, 19.17, 24.15],
+    sl_kh:  [19.07, 20.22, 20.59],
+    sl_hh:  [ 0.342, 0.183, 0.218],
+    dt_tt:  [49.22, 44.93, 56.54],
+    dt_kh:  [42.23, 44.77, 45.58],
+    cp_tt:  [ 1.42,  1.68,  1.86],
+    cp_kh:  [27.27, 27.27, 27.27],
+    ksd:    [0.9984, 0.9968, 0.9992],
+    knm:    [0.9800, 0.9560, 0.9800],
+    dataMonths: 3,
+  },
+};
+
+const PLANT_KEYS = ['TNWP','TNTVWP1','TNDKL1WP','TNTVSP'];
+
+// Derived: luy ke
+function luyKe(plant) {
+  const p = PLANTS[plant];
+  return {
+    sl: p.sl_tt.reduce((a,b)=>a+b,0),
+    dt: p.dt_tt.reduce((a,b)=>a+b,0),
+    cp: p.cp_tt.reduce((a,b)=>a+b,0),
+    sl_kh: p.sl_kh.reduce((a,b)=>a+b,0),
+    dt_kh: p.dt_kh.reduce((a,b)=>a+b,0),
+  };
+}
+
+function totals() {
+  let sl=0, dt=0, cp=0, sl_kh=0;
+  PLANT_KEYS.forEach(k => {
+    const lk = luyKe(k);
+    sl += lk.sl; dt += lk.dt; cp += lk.cp; sl_kh += lk.sl_kh;
+  });
+  return { sl, dt, cp, sl_kh };
+}
+
+// ── STATE ──
+let curPlant  = 'ALL';
+let curSec    = 'overview';
+let charts    = {};
+
+// ── CLOCK ──
+(function tick(){
+  document.getElementById('clock').textContent = new Date().toLocaleString('vi-VN',{hour12:false});
+  setTimeout(tick,1000);
+})();
+
+// ── NAV ──
+function switchPlant(plant, btn) {
+  curPlant = plant;
+  document.querySelectorAll('.plant-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (plant === 'ALL') {
+    showPage('page-'+curSec.replace('overview','overview').replace('sanluong','sanluong').replace('doanhthu','doanhthu').replace('chiphi','chiphi').replace('vanhanh','vanhanh'));
+  } else {
+    renderPlantDetail(plant);
+    showPage('page-plant-detail');
+  }
+}
+
+function switchSec(sec, btn) {
+  curSec = sec;
+  document.querySelectorAll('.sec-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (curPlant === 'ALL') {
+    showPage('page-'+sec);
+    renderSection(sec);
+  } else {
+    renderPlantDetail(curPlant);
+  }
+}
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+}
+
+// ── HELPERS ──
+function fmt(v, dec=2) {
+  if (v==null||isNaN(v)) return '—';
+  return (+v).toFixed(dec).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+}
+function pct(v) { return (v*100).toFixed(1)+'%'; }
+
+function killChart(id) {
+  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+}
+
+const C_MAP = { TNWP:'#1E6FD9', TNTVWP1:'#1FA843', TNDKL1WP:'#C47A10', TNTVSP:'#D4A017' };
+const CA_MAP= { TNWP:'rgba(30,111,217,.2)', TNTVWP1:'rgba(31,168,67,.2)', TNDKL1WP:'rgba(196,122,16,.2)', TNTVSP:'rgba(212,160,23,.2)' };
+
+const BASE = {
+  responsive:true, maintainAspectRatio:true,
+  plugins:{
+    legend:{labels:{font:{family:"'Barlow Condensed',sans-serif",size:11},color:'#3D5270',boxWidth:12}},
+    tooltip:{bodyFont:{family:"'JetBrains Mono',monospace",size:11}}
+  },
+  scales:{
+    x:{ticks:{font:{family:"'Barlow Condensed',sans-serif",size:10},color:'#7A90AE',maxRotation:0},grid:{color:'rgba(0,0,0,0.04)'}},
+    y:{ticks:{font:{family:"'JetBrains Mono',monospace",size:10},color:'#7A90AE'},grid:{color:'rgba(0,0,0,0.06)'}}
+  }
+};
+
+// ════════════════════════════════════════════════════
+// RENDER FUNCTIONS
+// ════════════════════════════════════════════════════
+
+function renderSection(sec) {
+  if (sec==='overview')  renderOverview();
+  if (sec==='sanluong')  renderSanLuong();
+  if (sec==='doanhthu')  renderDoanhThu();
+  if (sec==='chiphi')    renderChiPhi();
+  if (sec==='vanhanh')   renderVanHanh();
+}
+
+// ── OVERVIEW ──
+function renderOverview() {
+  const tot = totals();
+
+  // Banner
+  document.getElementById('tot-sl').innerHTML = fmt(tot.sl,1)+'<span class="tb-unit">tr kWh</span>';
+  document.getElementById('tot-dt').innerHTML = fmt(tot.dt,1)+'<span class="tb-unit">tỷ đ</span>';
+  document.getElementById('tot-cp').innerHTML = fmt(tot.cp,1)+'<span class="tb-unit">tỷ đ</span>';
+  document.getElementById('tot-cap').innerHTML = '792<span class="tb-unit">MW</span>';
+
+  const slHt = tot.sl/tot.sl_kh;
+  document.getElementById('tot-sl-d').textContent = (slHt>=1?'▲':'▼')+(slHt*100).toFixed(1)+'% KH';
+  document.getElementById('tot-sl-d').className = 'tb-d '+(slHt>=1?'tb-d-up':'tb-d-down');
+  document.getElementById('tot-dt-d').textContent = fmt(tot.dt/4,0)+' tỷ/NM TB';
+  document.getElementById('tot-cp-d').textContent = (tot.cp/tot.dt*100).toFixed(1)+'% DT';
+
+  // Plant Cards
+  const row = document.getElementById('plant-cards-row');
+  row.innerHTML = '';
+  PLANT_KEYS.forEach(key => {
+    const p = PLANTS[key];
+    const lk = luyKe(key);
+    const ht = lk.sl/lk.sl_kh;
+    const htCls = ht>=1?'delta-up':ht>=0.9?'delta-warn':'delta-down';
+    const htArr = ht>=1?'▲':'▼';
+    const pctKhNam = lk.sl/p.kh_sl_nam*100;
+
+    row.innerHTML += `
+    <div class="plant-overview-card" style="background:var(--card);border:1px solid var(--border);"
+         onclick="switchPlant('${key}', document.querySelector('[data-plant=${key}]'))">
+      <div class="poc-accent" style="background:${p.color}"></div>
+      <div style="padding-left:8px;">
+        <div class="poc-name" style="color:${p.color}">${p.name}</div>
+        <div class="poc-sub">${p.fullName}</div>
+        <div class="poc-type" style="background:${p.colorA};color:${p.color};border:1px solid ${p.colorA};">
+          ${p.typeLabel} · ${p.capacity} MW · ${p.location}
+        </div>
+        <div class="poc-metrics">
+          <div>
+            <div class="poc-metric-val" style="color:${p.color}">${fmt(lk.sl,1)}</div>
+            <div class="poc-metric-lbl">tr kWh SL TT</div>
+          </div>
+          <div>
+            <div class="poc-metric-val" style="color:var(--green)">${fmt(lk.dt,0)}</div>
+            <div class="poc-metric-lbl">tỷ đ DT TT</div>
+          </div>
+          <div>
+            <div class="poc-metric-val" style="color:var(--amber)">${fmt(lk.cp,1)}</div>
+            <div class="poc-metric-lbl">tỷ đ CP HĐSX</div>
+          </div>
+          <div>
+            <div class="poc-metric-val ${htCls}">${htArr}${(ht*100).toFixed(1)}%</div>
+            <div class="poc-metric-lbl">HT kế hoạch</div>
+          </div>
+        </div>
+        <div class="poc-progress">
+          <div style="font-size:10px;color:var(--gray);margin-bottom:4px;">
+            SL Lũy Kế / KH Năm: ${pctKhNam.toFixed(1)}%
+          </div>
+          <div class="poc-prog-bar">
+            <div class="poc-prog-fill" style="width:${Math.min(pctKhNam,100)}%;background:${p.color};"></div>
+          </div>
+        </div>
+        <div style="margin-top:8px;font-size:10px;color:var(--gray);">
+          Dữ liệu: ${p.dataMonths} tháng đầu năm 2026 · Click để xem chi tiết →
+        </div>
+      </div>
+    </div>`;
+  });
+
+  // Summary table
+  let tbody = '';
+  PLANT_KEYS.forEach(key => {
+    const p = PLANTS[key];
+    const lk = luyKe(key);
+    const ht = lk.sl/lk.sl_kh;
+    const cls = ht>=1?'good':ht>=0.9?'warn':'bad';
+    const avgKsd = p.ksd.reduce((a,b)=>a+b,0)/p.ksd.length;
+    tbody += `<tr>
+      <td><strong style="color:${p.color}">${p.name}</strong><div style="font-size:10px;color:var(--gray)">${p.fullName}</div></td>
+      <td><span class="badge ${p.type==='solar'?'badge-yellow':'badge-blue'}">${p.typeLabel}</span></td>
+      <td class="num">${p.capacity}</td>
+      <td>${p.location}</td>
+      <td class="num">${fmt(lk.sl_kh,2)}</td>
+      <td class="num">${fmt(lk.sl,2)}</td>
+      <td class="num ${cls}">${pct(ht)}</td>
+      <td class="num">${fmt(lk.dt,2)}</td>
+      <td class="num">${fmt(lk.cp,2)}</td>
+      <td class="num ${avgKsd>=0.97?'good':'warn'}">${(avgKsd*100).toFixed(2)}</td>
+      <td><span class="badge badge-navy">${p.dataMonths}T</span></td>
+    </tr>`;
+  });
+  // Footer total
+  const tot2 = totals();
+  document.getElementById('tbl-summary-body').innerHTML = tbody;
+  document.getElementById('tbl-summary-foot').innerHTML = `
+    <tr style="background:var(--bg);">
+      <td colspan="4" class="bold" style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">
+        TỔNG TẬP ĐOÀN (4 Nhà Máy · 792.03 MW)
+      </td>
+      <td class="num bold">${fmt(tot2.sl_kh,2)}</td>
+      <td class="num bold">${fmt(tot2.sl,2)}</td>
+      <td class="num bold">${pct(tot2.sl/tot2.sl_kh)}</td>
+      <td class="num bold">${fmt(tot2.dt,2)}</td>
+      <td class="num bold">${fmt(tot2.cp,2)}</td>
+      <td class="num bold">—</td><td>—</td>
+    </tr>`;
+
+  // Charts
+  const plantLabels = PLANT_KEYS.map(k=>PLANTS[k].name);
+
+  killChart('ch-ov-sl-compare');
+  charts['ch-ov-sl-compare'] = new Chart(document.getElementById('ch-ov-sl-compare'),{
+    type:'bar',
+    data:{labels:plantLabels, datasets:[
+      {label:'SL Thực Tế',data:PLANT_KEYS.map(k=>luyKe(k).sl),backgroundColor:PLANT_KEYS.map(k=>CA_MAP[k]),borderColor:PLANT_KEYS.map(k=>C_MAP[k]),borderWidth:2,borderRadius:4},
+      {label:'SL Kế Hoạch',data:PLANT_KEYS.map(k=>luyKe(k).sl_kh),type:'line',borderColor:'rgba(0,0,0,.3)',backgroundColor:'transparent',borderWidth:2,borderDash:[5,3],pointRadius:6,tension:0}
+    ]},
+    options:{...BASE}
+  });
+
+  killChart('ch-ov-sl-pie');
+  charts['ch-ov-sl-pie'] = new Chart(document.getElementById('ch-ov-sl-pie'),{
+    type:'doughnut',
+    data:{
+      labels:PLANT_KEYS.map(k=>PLANTS[k].name),
+      datasets:[{data:PLANT_KEYS.map(k=>luyKe(k).sl),backgroundColor:PLANT_KEYS.map(k=>C_MAP[k]),borderWidth:3,borderColor:'#fff',hoverOffset:6}]
+    },
+    options:{responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{position:'bottom',labels:{font:{family:"'Barlow Condensed',sans-serif",size:11},boxWidth:12}},
+      tooltip:{bodyFont:{family:"'JetBrains Mono',monospace",size:11}}}}
+  });
+
+  killChart('ch-ov-dt-bar');
+  charts['ch-ov-dt-bar'] = new Chart(document.getElementById('ch-ov-dt-bar'),{
+    type:'bar',
+    data:{labels:plantLabels,datasets:[{label:'DT Lũy Kế (tỷ đ)',data:PLANT_KEYS.map(k=>luyKe(k).dt),backgroundColor:PLANT_KEYS.map(k=>CA_MAP[k]),borderColor:PLANT_KEYS.map(k=>C_MAP[k]),borderWidth:2,borderRadius:5}]},
+    options:{...BASE,indexAxis:'y',plugins:{...BASE.plugins,legend:{display:false}}}
+  });
+
+  killChart('ch-ov-cp-bar');
+  charts['ch-ov-cp-bar'] = new Chart(document.getElementById('ch-ov-cp-bar'),{
+    type:'bar',
+    data:{labels:plantLabels,datasets:[{label:'CP HĐSX (tỷ đ)',data:PLANT_KEYS.map(k=>luyKe(k).cp),backgroundColor:['rgba(30,111,217,.2)','rgba(31,168,67,.2)','rgba(196,122,16,.2)','rgba(212,160,23,.2)'],borderColor:PLANT_KEYS.map(k=>C_MAP[k]),borderWidth:2,borderRadius:5}]},
+    options:{...BASE,indexAxis:'y',plugins:{...BASE.plugins,legend:{display:false}}}
+  });
+
+  killChart('ch-ov-kh-radar');
+  charts['ch-ov-kh-radar'] = new Chart(document.getElementById('ch-ov-kh-radar'),{
+    type:'radar',
+    data:{
+      labels:['SL/KH','DT/KH','KSD','KNM','CP Hiệu Quả'],
+      datasets:PLANT_KEYS.map(k=>{
+        const p=PLANTS[k]; const lk=luyKe(k);
+        const avgKsd=p.ksd.reduce((a,b)=>a+b,0)/p.ksd.length;
+        const avgKnm=p.knm.reduce((a,b)=>a+b,0)/p.knm.length;
+        return {
+          label:p.name,
+          data:[lk.sl/lk.sl_kh*100, lk.dt/lk.dt_kh*100, avgKsd*100, avgKnm*100+50, (1-lk.cp/lk.dt)*100],
+          borderColor:p.color, backgroundColor:p.colorA, borderWidth:2, pointRadius:3
+        };
+      })
+    },
+    options:{responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{labels:{font:{size:10},boxWidth:10}}},
+      scales:{r:{ticks:{font:{size:9},stepSize:25},pointLabels:{font:{size:10}},min:50,max:120}}}
+  });
+}
+
+// ── SẢN LƯỢNG ──
+function renderSanLuong() {
+  const tot = totals();
+  document.getElementById('sl-tot-lk').innerHTML = fmt(tot.sl,1)+'<span class="kpi-unit">tr kWh</span>';
+  document.getElementById('sl-kh-nam').innerHTML = '1,517<span class="kpi-unit">tr kWh</span>';
+
+  const monthAll = ['T01','T02','T03','T04'];
+  // Grouped bar: each plant per month
+  killChart('ch-sl-monthly-grouped');
+  charts['ch-sl-monthly-grouped'] = new Chart(document.getElementById('ch-sl-monthly-grouped'),{
+    type:'bar',
+    data:{labels:monthAll, datasets: PLANT_KEYS.map(k=>{
+      const p=PLANTS[k];
+      return {label:p.name, data:p.sl_tt.concat(Array(4-p.sl_tt.length).fill(null)),
+              backgroundColor:p.colorA, borderColor:p.color, borderWidth:2, borderRadius:3};
+    })},
+    options:{...BASE}
+  });
+
+  // Cumulative by plant
+  killChart('ch-sl-cumulative');
+  charts['ch-sl-cumulative'] = new Chart(document.getElementById('ch-sl-cumulative'),{
+    type:'line',
+    data:{labels:monthAll, datasets: PLANT_KEYS.map(k=>{
+      const p=PLANTS[k];
+      let cum=0;
+      const cumData = monthAll.map((_,i)=> i<p.sl_tt.length ? (cum+=p.sl_tt[i], cum) : null);
+      return {label:p.name, data:cumData, borderColor:p.color, backgroundColor:p.colorA,
+              fill:false, tension:0.3, pointRadius:5, borderWidth:2.5};
+    })},
+    options:{...BASE}
+  });
+
+  // HT % per month
+  killChart('ch-sl-ht-pct');
+  charts['ch-sl-ht-pct'] = new Chart(document.getElementById('ch-sl-ht-pct'),{
+    type:'line',
+    data:{labels:monthAll, datasets: PLANT_KEYS.map(k=>{
+      const p=PLANTS[k];
+      const htPct = p.sl_tt.map((v,i)=>+(v/p.sl_kh[i]*100).toFixed(1));
+      return {label:p.name, data:htPct.concat(Array(4-htPct.length).fill(null)),
+              borderColor:p.color, backgroundColor:'transparent', tension:0.3, pointRadius:5, borderWidth:2,
+              borderDash: k==='TNTVSP'?[5,3]:[]};
+    })},
+    options:{...BASE,
+      plugins:{...BASE.plugins, annotation:{annotations:{line100:{type:'line',yMin:100,yMax:100,borderColor:'rgba(0,0,0,.2)',borderWidth:1,borderDash:[5,3]}}}},
+      scales:{...BASE.scales, y:{...BASE.scales.y, min:40, max:130}}}
+  });
+}
+
+// ── DOANH THU ──
+function renderDoanhThu() {
+  const tot = totals();
+  document.getElementById('dt-tot-lk').innerHTML = fmt(tot.dt,1)+'<span class="kpi-unit">tỷ đ</span>';
+
+  const monthAll = ['T01','T02','T03','T04'];
+
+  killChart('ch-dt-monthly');
+  charts['ch-dt-monthly'] = new Chart(document.getElementById('ch-dt-monthly'),{
+    type:'bar',
+    data:{labels:monthAll, datasets: PLANT_KEYS.map(k=>{
+      const p=PLANTS[k];
+      return {label:p.name, data:p.dt_tt.concat(Array(4-p.dt_tt.length).fill(null)),
+              backgroundColor:p.colorA, borderColor:p.color, borderWidth:2, borderRadius:3};
+    })},
+    options:{...BASE}
+  });
+
+  killChart('ch-dt-pie');
+  charts['ch-dt-pie'] = new Chart(document.getElementById('ch-dt-pie'),{
+    type:'doughnut',
+    data:{labels:PLANT_KEYS.map(k=>PLANTS[k].name),
+      datasets:[{data:PLANT_KEYS.map(k=>luyKe(k).dt),
+        backgroundColor:PLANT_KEYS.map(k=>C_MAP[k]),borderWidth:3,borderColor:'#fff',hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12}},
+      tooltip:{bodyFont:{family:"'JetBrains Mono',monospace",size:11}}}}
+  });
+
+  // DT TT vs KH stacked
+  killChart('ch-dt-vs-kh');
+  charts['ch-dt-vs-kh'] = new Chart(document.getElementById('ch-dt-vs-kh'),{
+    type:'bar',
+    data:{labels:monthAll, datasets: PLANT_KEYS.flatMap(k=>{
+      const p=PLANTS[k];
+      return [
+        {label:`${p.name} TT`,data:p.dt_tt.concat(Array(4-p.dt_tt.length).fill(null)),
+         backgroundColor:p.color,borderRadius:2,stack:'tt'},
+        {label:`${p.name} KH`,data:p.dt_kh.concat(Array(4-p.dt_kh.length).fill(null)),
+         backgroundColor:p.colorA,borderRadius:2,stack:'kh',borderDash:[]}
+      ];
+    })},
+    options:{...BASE, plugins:{...BASE.plugins,legend:{display:false}}}
+  });
+
+  killChart('ch-dt-cumulative');
+  charts['ch-dt-cumulative'] = new Chart(document.getElementById('ch-dt-cumulative'),{
+    type:'line',
+    data:{labels:monthAll, datasets: PLANT_KEYS.map(k=>{
+      const p=PLANTS[k]; let cum=0;
+      const cumData = monthAll.map((_,i)=> i<p.dt_tt.length ? (cum+=p.dt_tt[i], cum) : null);
+      return {label:p.name, data:cumData, borderColor:p.color, backgroundColor:p.colorA,
+              fill:false, tension:0.3, pointRadius:5, borderWidth:2.5};
+    })},
+    options:{...BASE}
+  });
+}
+
+// ── CHI PHÍ ──
+function renderChiPhi() {
+  const tot = totals();
+  document.getElementById('cp-tot-lk').innerHTML = fmt(tot.cp,1)+'<span class="kpi-unit">tỷ đ</span>';
+  document.getElementById('cp-per-sl').innerHTML = fmt(tot.cp/tot.sl*1e6,0)+'<span class="kpi-unit">đ/kWh</span>';
+
+  const monthAll = ['T01','T02','T03','T04'];
+
+  killChart('ch-cp-monthly');
+  charts['ch-cp-monthly'] = new Chart(document.getElementById('ch-cp-monthly'),{
+    type:'bar',
+    data:{labels:monthAll, datasets: PLANT_KEYS.map(k=>{
+      const p=PLANTS[k];
+      return {label:p.name, data:p.cp_tt.concat(Array(4-p.cp_tt.length).fill(null)),
+              backgroundColor:p.colorA, borderColor:p.color, borderWidth:2, borderRadius:3};
+    })},
+    options:{...BASE}
+  });
+
+  killChart('ch-cp-ratio');
+  const ratios = PLANT_KEYS.map(k=>{
+    const lk=luyKe(k); return +(lk.cp/lk.dt*100).toFixed(2);
+  });
+  charts['ch-cp-ratio'] = new Chart(document.getElementById('ch-cp-ratio'),{
+    type:'bar',
+    data:{labels:PLANT_KEYS.map(k=>PLANTS[k].name),
+      datasets:[{label:'CP/DT (%)',data:ratios,
+        backgroundColor:PLANT_KEYS.map(k=>CA_MAP[k]),borderColor:PLANT_KEYS.map(k=>C_MAP[k]),
+        borderWidth:2,borderRadius:5}]},
+    options:{...BASE,indexAxis:'y',plugins:{...BASE.plugins,legend:{display:false}},
+      scales:{...BASE.scales,x:{...BASE.scales.x,max:20}}}
+  });
+}
+
+// ── VẬN HÀNH ──
+function renderVanHanh() {
+  const monthAll = ['T01','T02','T03','T04'];
+
+  killChart('ch-vh-ksd');
+  charts['ch-vh-ksd'] = new Chart(document.getElementById('ch-vh-ksd'),{
+    type:'line',
+    data:{labels:monthAll, datasets: PLANT_KEYS.map(k=>{
+      const p=PLANTS[k];
+      return {label:p.name, data:p.ksd.map(v=>+(v*100).toFixed(2)).concat(Array(4-p.ksd.length).fill(null)),
+              borderColor:p.color, backgroundColor:'transparent', tension:0.3, pointRadius:5, borderWidth:2.5};
+    })},
+    options:{...BASE, scales:{...BASE.scales,y:{...BASE.scales.y,min:92,max:101}}}
+  });
+
+  killChart('ch-vh-knm');
+  charts['ch-vh-knm'] = new Chart(document.getElementById('ch-vh-knm'),{
+    type:'bar',
+    data:{labels:monthAll, datasets: PLANT_KEYS.map(k=>{
+      const p=PLANTS[k];
+      return {label:p.name, data:p.knm.map(v=>+(v*100).toFixed(2)).concat(Array(4-p.knm.length).fill(null)),
+              backgroundColor:p.colorA, borderColor:p.color, borderWidth:2, borderRadius:3};
+    })},
+    options:{...BASE}
+  });
+
+  killChart('ch-vh-radar');
+  charts['ch-vh-radar'] = new Chart(document.getElementById('ch-vh-radar'),{
+    type:'radar',
+    data:{
+      labels:['KSD','KNM','SL/KH','DT/KH','Ít Hao Hụt'],
+      datasets: PLANT_KEYS.map(k=>{
+        const p=PLANTS[k]; const lk=luyKe(k);
+        const avgKsd=p.ksd.reduce((a,b)=>a+b,0)/p.ksd.length;
+        const avgKnm=p.knm.reduce((a,b)=>a+b,0)/p.knm.length;
+        const totalHH=p.sl_hh.reduce((a,b)=>a+b,0);
+        return {label:p.name,
+          data:[avgKsd*100, Math.min(avgKnm*200,100), lk.sl/lk.sl_kh*100, lk.dt/lk.dt_kh*100, (1-totalHH/lk.sl)*100],
+          borderColor:p.color, backgroundColor:p.colorA, borderWidth:2, pointRadius:3};
+      })
+    },
+    options:{responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{labels:{font:{size:10},boxWidth:10}}},
+      scales:{r:{min:50,max:120,pointLabels:{font:{size:10}},ticks:{font:{size:9}}}}}
+  });
+
+  killChart('ch-vh-haohut');
+  charts['ch-vh-haohut'] = new Chart(document.getElementById('ch-vh-haohut'),{
+    type:'bar',
+    data:{labels:PLANT_KEYS.map(k=>PLANTS[k].name),
+      datasets:[
+        {label:'SL Hao Hụt (tr kWh)',data:PLANT_KEYS.map(k=>+PLANTS[k].sl_hh.reduce((a,b)=>a+b,0).toFixed(3)),
+          backgroundColor:PLANT_KEYS.map(k=>CA_MAP[k]),borderColor:PLANT_KEYS.map(k=>C_MAP[k]),borderWidth:2,borderRadius:4}
+      ]},
+    options:{...BASE,plugins:{...BASE.plugins,legend:{display:false}}}
+  });
+}
+
+// ════════════════════════════════════════════════════
+// PLANT DETAIL PAGE
+// ════════════════════════════════════════════════════
+function renderPlantDetail(key) {
+  const p = PLANTS[key];
+  const lk = luyKe(key);
+  const ht = lk.sl/lk.sl_kh;
+  const avgKsd = p.ksd.reduce((a,b)=>a+b,0)/p.ksd.length;
+  const avgKnm = p.knm.reduce((a,b)=>a+b,0)/p.knm.length;
+  const htCls = ht>=1?'delta-up':ht>=0.9?'delta-warn':'delta-down';
+  const monthLabels = p.months;
+
+  const container = document.getElementById('plant-detail-content');
+  container.innerHTML = `
+  <!-- Plant Header -->
+  <div style="background:${p.color};border-radius:10px;padding:20px 24px;margin-bottom:18px;color:#fff;position:relative;overflow:hidden;">
+    <div style="position:absolute;right:-20px;top:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.08);"></div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;opacity:.7;margin-bottom:4px;">
+      ${p.typeLabel} · ${p.location} · ${p.capacity} MW
+    </div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;letter-spacing:2px;line-height:1.1;">${p.name}</div>
+    <div style="font-size:13px;opacity:.8;margin-top:3px;">${p.fullName}</div>
+    <div style="display:flex;gap:20px;margin-top:14px;flex-wrap:wrap;">
+      <div><div style="font-size:22px;font-weight:700;">${fmt(lk.sl,2)}</div><div style="font-size:10px;opacity:.7;letter-spacing:1px;text-transform:uppercase;">triệu kWh SL TT</div></div>
+      <div style="width:1px;background:rgba(255,255,255,.2);"></div>
+      <div><div style="font-size:22px;font-weight:700;">${fmt(lk.dt,2)}</div><div style="font-size:10px;opacity:.7;letter-spacing:1px;text-transform:uppercase;">tỷ đ DT TT</div></div>
+      <div style="width:1px;background:rgba(255,255,255,.2);"></div>
+      <div><div style="font-size:22px;font-weight:700;">${fmt(lk.cp,2)}</div><div style="font-size:10px;opacity:.7;letter-spacing:1px;text-transform:uppercase;">tỷ đ CP HĐSX</div></div>
+      <div style="width:1px;background:rgba(255,255,255,.2);"></div>
+      <div><div style="font-size:22px;font-weight:700;">${(ht*100).toFixed(1)}%</div><div style="font-size:10px;opacity:.7;letter-spacing:1px;text-transform:uppercase;">Hoàn thành KH</div></div>
+    </div>
+  </div>
+
+  <!-- KPI Row -->
+  <div class="g4 mb2">
+    <div class="card kpi" style="border-left:4px solid ${p.color};">
+      <div class="c-label">KSD TB</div>
+      <div class="kpi-val" style="color:${p.color}">${(avgKsd*100).toFixed(2)}<span class="kpi-unit">%</span></div>
+      <div class="kpi-sub">Hệ số khả dụng TB</div>
+    </div>
+    <div class="card kpi" style="border-left:4px solid ${p.color};">
+      <div class="c-label">KNM TB</div>
+      <div class="kpi-val" style="color:${p.color}">${(avgKnm*100).toFixed(2)}<span class="kpi-unit">%</span></div>
+      <div class="kpi-sub">Hệ số nhà máy TB</div>
+    </div>
+    <div class="card kpi" style="border-left:4px solid ${p.color};">
+      <div class="c-label">SL / KH Năm</div>
+      <div class="kpi-val" style="color:${p.color}">${(lk.sl/p.kh_sl_nam*100).toFixed(1)}<span class="kpi-unit">%</span></div>
+      <div class="kpi-sub">Lũy kế / ${fmt(p.kh_sl_nam,2)} tr kWh</div>
+    </div>
+    <div class="card kpi" style="border-left:4px solid ${p.color};">
+      <div class="c-label">DT / KH Năm</div>
+      <div class="kpi-val" style="color:${p.color}">${(lk.dt/p.kh_dt_nam*100).toFixed(1)}<span class="kpi-unit">%</span></div>
+      <div class="kpi-sub">Lũy kế / ${fmt(p.kh_dt_nam,2)} tỷ đ</div>
+    </div>
+  </div>
+
+  <div class="g2 mb2">
+    <div class="card">
+      <div class="c-title">Sản Lượng TT vs KH (triệu kWh) <span class="badge badge-blue">${p.dataMonths} Tháng</span></div>
+      <div class="chart-wrap"><canvas id="pd-ch-sl-${key}"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="c-title">Doanh Thu TT vs KH (tỷ đồng)</div>
+      <div class="chart-wrap"><canvas id="pd-ch-dt-${key}"></canvas></div>
+    </div>
+  </div>
+
+  <div class="g3 mb2">
+    <div class="card">
+      <div class="c-title">Hệ Số Vận Hành (%)</div>
+      <div class="chart-wrap short"><canvas id="pd-ch-koef-${key}"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="c-title">Chi Phí HĐSX (tỷ đ)</div>
+      <div class="chart-wrap short"><canvas id="pd-ch-cp-${key}"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="c-title">Hoàn Thành KH (%)</div>
+      <div class="chart-wrap short"><canvas id="pd-ch-ht-${key}"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Monthly Table -->
+  <div class="card">
+    <div class="c-title">Bảng Chi Tiết Từng Tháng – ${p.name}</div>
+    <div style="overflow-x:auto;">
+      <table class="tbl">
+        <thead><tr><th>Tháng</th><th>SL DB</th><th>SL TT</th><th>SL HH</th><th>HT SL</th><th>DT TT</th><th>DT KH</th><th>HT DT</th><th>CP TT</th><th>KSD</th><th>KNM</th></tr></thead>
+        <tbody id="pd-tbl-${key}"></tbody>
+      </table>
+    </div>
+  </div>`;
+
+  // Build charts (setTimeout to let DOM render)
+  setTimeout(() => {
+    killChart(`pd-ch-sl-${key}`);
+    charts[`pd-ch-sl-${key}`] = new Chart(document.getElementById(`pd-ch-sl-${key}`),{
+      type:'bar',
+      data:{labels:monthLabels, datasets:[
+        {label:'SL Thực Tế',data:p.sl_tt,backgroundColor:p.colorA,borderColor:p.color,borderWidth:2,borderRadius:4},
+        {label:'SL Kế Hoạch',data:p.sl_kh,type:'line',borderColor:'rgba(0,0,0,.3)',backgroundColor:'transparent',borderWidth:2,borderDash:[5,3],pointRadius:5,tension:0}
+      ]},
+      options:{...BASE}
+    });
+
+    killChart(`pd-ch-dt-${key}`);
+    charts[`pd-ch-dt-${key}`] = new Chart(document.getElementById(`pd-ch-dt-${key}`),{
+      type:'bar',
+      data:{labels:monthLabels, datasets:[
+        {label:'DT Thực Tế',data:p.dt_tt,backgroundColor:p.colorA,borderColor:p.color,borderWidth:2,borderRadius:4},
+        {label:'DT Kế Hoạch',data:p.dt_kh,type:'line',borderColor:'rgba(0,0,0,.3)',backgroundColor:'transparent',borderWidth:2,borderDash:[5,3],pointRadius:5,tension:0}
+      ]},
+      options:{...BASE}
+    });
+
+    killChart(`pd-ch-koef-${key}`);
+    charts[`pd-ch-koef-${key}`] = new Chart(document.getElementById(`pd-ch-koef-${key}`),{
+      type:'bar',
+      data:{labels:monthLabels, datasets:[
+        {label:'KSD (%)',data:p.ksd.map(v=>+(v*100).toFixed(2)),backgroundColor:'rgba(31,168,67,.2)',borderColor:'#1FA843',borderWidth:2,borderRadius:3},
+        {label:'KNM (%)',data:p.knm.map(v=>+(v*100).toFixed(2)),backgroundColor:p.colorA,borderColor:p.color,borderWidth:2,borderRadius:3}
+      ]},
+      options:{...BASE}
+    });
+
+    killChart(`pd-ch-cp-${key}`);
+    charts[`pd-ch-cp-${key}`] = new Chart(document.getElementById(`pd-ch-cp-${key}`),{
+      type:'bar',
+      data:{labels:monthLabels, datasets:[
+        {label:'CP TT',data:p.cp_tt,backgroundColor:'rgba(196,122,16,.2)',borderColor:'#C47A10',borderWidth:2,borderRadius:3},
+      ]},
+      options:{...BASE,plugins:{...BASE.plugins,legend:{display:false}}}
+    });
+
+    killChart(`pd-ch-ht-${key}`);
+    charts[`pd-ch-ht-${key}`] = new Chart(document.getElementById(`pd-ch-ht-${key}`),{
+      type:'bar',
+      data:{labels:monthLabels, datasets:[
+        {label:'HT KH SL (%)',data:p.sl_tt.map((v,i)=>+(v/p.sl_kh[i]*100).toFixed(1)),
+          backgroundColor:p.sl_tt.map((v,i)=>v>=p.sl_kh[i]?'rgba(31,168,67,.25)':'rgba(217,64,64,.2)'),
+          borderColor:p.sl_tt.map((v,i)=>v>=p.sl_kh[i]?'#1FA843':'#D94040'),
+          borderWidth:2,borderRadius:3}
+      ]},
+      options:{...BASE,plugins:{...BASE.plugins,legend:{display:false}},
+        scales:{...BASE.scales,y:{...BASE.scales.y,min:40,max:130}}}
+    });
+
+    // Table
+    const tbody = document.getElementById(`pd-tbl-${key}`);
+    if(tbody) {
+      tbody.innerHTML = monthLabels.map((m,i)=>{
+        const slHt = p.sl_tt[i]/p.sl_kh[i];
+        const dtHt = p.dt_tt[i]/p.dt_kh[i];
+        const cls = v=>v>=1?'good':v>=0.9?'warn':'bad';
+        return `<tr>
+          <td><strong>${m}/2026</strong></td>
+          <td class="num">${fmt(p.sl_kh[i])}</td>
+          <td class="num">${fmt(p.sl_tt[i])}</td>
+          <td class="num bad">${fmt(p.sl_hh[i],3)}</td>
+          <td class="num ${cls(slHt)}">${(slHt*100).toFixed(1)}%</td>
+          <td class="num">${fmt(p.dt_tt[i])}</td>
+          <td class="num">${fmt(p.dt_kh[i])}</td>
+          <td class="num ${cls(dtHt)}">${(dtHt*100).toFixed(1)}%</td>
+          <td class="num">${fmt(p.cp_tt[i])}</td>
+          <td class="num good">${(p.ksd[i]*100).toFixed(2)}%</td>
+          <td class="num">${(p.knm[i]*100).toFixed(2)}%</td>
+        </tr>`;
+      }).join('');
+    }
+  }, 50);
+}
+
+// ════════════ INIT ════════════
+renderOverview();
+</script>
+</body>
+</html>
